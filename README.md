@@ -2,7 +2,7 @@
 Wordle bot that uses a basic algorithm to compute the next guess. Simulates the game in the code.
 
 
-Play.py = Wordle Game
+Game.py = Wordle Game
 
 Wordle.py = Wordle Bot
 
