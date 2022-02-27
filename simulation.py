@@ -2,90 +2,80 @@ from string import ascii_lowercase
 from collections import Counter
 import collections
 import random
+import os
 
-my_file = open("list.txt", "r")
 
-words = my_file.readlines()
-realword = random.choice(words)
+my_file = open("allowed-answers.txt", "r")
 
-list = []
-removed = []
+realword = input("Guess: ")
+
+all_words = my_file.readlines() # Huge word list to read in from text file
+current_possible_words = set(all_words)
 occurances = {}
 topletters = []
 wordtoGuess = "crane"
 
-def main():
 
-    print("===================================================================================================================")
+def main():
+    global current_possible_words
+    global wordtoGuess
+    print("=========================================================================================================")
     print(f"Trying to guess: {realword}")
-    print("-------------------------------------------------------------------------------------------------------------------")
     count = 0
     while count < 8:
-        word = wordtoGuess
+        if len(current_possible_words) == 1:
+            guessing = []
+            guessing = list(current_possible_words)
+            wordtoGuess = guessing[0].rstrip()
+            word = wordtoGuess
+        else:
+            word = wordtoGuess.rstrip()
+        pattern = playGame(word).upper().rstrip()
         print(f"Guessing: {word}")
-        pattern = playGame(word).upper()
         print("")
         if pattern == "stop":
             break
         if pattern == "GGGGG":
             print(f"[{realword.rstrip()}] Done ({count + 1})")
-            print("===================================================================================================================")
             break
-        for y in range(0, len(word.rstrip())):
-            pattern = pattern.rstrip()
+        for y in range(len(word.rstrip())):
             if pattern[y] == "G":
-                isletter(word[y], y)
+                current_possible_words = exact_letter_match(current_possible_words, word[y], y)
             if pattern[y] == "Y":
-                contains(word[y], y)
+                current_possible_words = contains_only_elsewhere(current_possible_words, word[y], y)
             if pattern[y] == "X":
-                nocontains(word[y])
+                current_possible_words = must_not_contain(current_possible_words, word[y])
 
-        for x in list:
+        for x in current_possible_words:
             print (f"{x.rstrip()}", end=", ")
         print ("")
-        global words
-        words = list.copy()
         makeguess()
         count += 1
-        print("-------------------------------------------------------------------------------------------------------------------")
+        print("---------------------------------------------------------------------------------------------------------")
 
-#Find the words that only match the criteria
-def contains(letter, place):
-    list.clear()
-    for x in words:
-        if x not in removed:
-            if letter in x:
-                if letter == x[place]:
-                    removed.append(x)
-                else:
-                    list.append(x)
-            else:
-                removed.append(x)
-def nocontains(letter):
-    list.clear()
-    for x in words:
-        if x not in removed:
-            if letter not in x:
-                list.append(x)
-            else:
-                removed.append(x)
-def isletter(letter, place):
-    list.clear()
-    for x in words:
-        if x not in removed:
-            if letter == x[place]:
-                list.append(x)
-            else:
-                removed.append(x)
+def contains_only_elsewhere(possible_words, letter, place):
+    to_remove = {word for word in possible_words
+                 if letter not in word or word[place] == letter}
+    return possible_words - to_remove
 
-#Make guess based on letter popularity of remaming words. Negate duplicates.
+def must_not_contain(possible_words, letter):
+    to_remove = {word for word in possible_words
+                 if letter in word}
+    return possible_words - to_remove
+
+def exact_letter_match(possible_words, letter, place):
+    to_remove = {word for word in possible_words
+                 if word[place] != letter}
+    return possible_words - to_remove
+
 def makeguess():
+    topletters.clear()
     highest = 0
     letter = 'e'
     occurances.clear()
     for c in ascii_lowercase:
         amount = 0
-        for x in words:
+        for x in current_possible_words:
             amount = amount + x.count(c)
             if amount > highest:
                 letter = c
@@ -98,44 +88,28 @@ def makeguess():
         print("(",i[0],":",i[1],") ", end="")
         topletters.append(i[0])
     maxscore = 0
-    maxword = "hello"
-    for z in words:
+    maxword = ""
+    print("")
+    for z in current_possible_words:
         score = 0
-        if str(topletters[0]) in z:
-            score = score + 15
-        if str(topletters[1]) in z:
-            score = score + 13
-        if str(topletters[2]) in z:
-            score = score + 12
-        if str(topletters[3]) in z:
-            score = score + 11
-        if str(topletters[4]) in z:
-            score = score + 9
-        if str(topletters[5]) in z:
-            score = score + 8
-        if str(topletters[6]) in z:
-            score = score + 5
-        if str(topletters[7]) in z:
-            score = score + 3
-        if str(topletters[8]) in z:
-            score = score + 2
-        if str(topletters[9]) in z:
-            score = score + 1
+        for y in range(0, 9):
+            if str(topletters[y]) in z:
+                score = score + (30/(y+5))
+        print(f"({z.rstrip()}, {score})")
         d = collections.defaultdict(int)
         for c in z:
             d[c] += 1
             if d[c] > 1:
-                score = score - 5
+                score = score - 30
         if score > maxscore:
             maxword = z
             maxscore = score
     print("")
     print("")
-    print (f"[{len(words)}] {maxword}")
+    print (f"[{len(current_possible_words)}] {maxword}")
     global wordtoGuess
     wordtoGuess = maxword
 
-#Play the wordle game
 def playGame(guess):
     sequence = ""
     guess = guess.rstrip()
@@ -150,5 +124,4 @@ def playGame(guess):
     print(sequence)
     return sequence
 
-#Start the program
 main()
