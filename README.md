@@ -12,6 +12,8 @@ Wordle.py = Wordle Bot
 
 Simulation.py = Combines previous two in order to simulate any game possible
 
+AllSimulation.py = Combines previous three in order to simulate all games possible
+
 
 <br />
 
