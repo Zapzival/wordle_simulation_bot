@@ -46,7 +46,7 @@ def main():
         global words
         words = list.copy()
         makeguess()
-        count = count + 1
+        count += 1
         print("-------------------------------------------------------------------------------------------------------------------")
 
 #Find the words that only match the criteria
