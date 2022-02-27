@@ -12,7 +12,7 @@ Wordle.py = Wordle Bot
 
 Simulation.py = Combines previous two in order to simulate any game possible
 
-AllSimulation.py = Combines previous three in order to simulate all games possible
+*AllSimulation.py = Combines previous three in order to simulate all games possible*
 
 
 <br />
@@ -23,4 +23,4 @@ list.txt = 2,300 possible answers in Wordle's Source Code
 
 allowed_guesses.txt = 13,000 possible guesses in Wordle's Source Code
 
-worddata.txt = Current data from guessing all 2,315 possible answers
+*worddata.txt = Current data from guessing all 2,315 possible answers*
